@@ -18,24 +18,27 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
-          sudo apt-get install -y libssl-dev libevent-dev libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-test-dev libboost-thread-dev
+          sudo apt-get install -y libssl-dev libevent-dev libboost-all-dev
           sudo apt-get install -y libdb-dev libdb++-dev
           sudo apt-get install -y libminiupnpc-dev libzmq3-dev
-          sudo apt-get install -y libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libqrencode-dev
+          sudo apt-get install -y qtbase5-dev qttools5-dev-tools qttools5-dev libqrencode-dev
+          
+      - name: Autogen
+        run: ./autogen.sh
+          
+      - name: Configure
+        run: ./configure --with-gui=qt5 --with-incompatible-bdb --disable-tests --disable-bench
           
       - name: Build
-        run: |
-          ./autogen.sh
-          ./configure --with-gui=qt5 --with-incompatible-bdb
-          make -j$(nproc)
+        run: make -j$(nproc)
           
       - name: Package
         run: |
           mkdir -p release
-          cp src/woxycoind release/
-          cp src/woxycoin-cli release/
-          cp src/woxycoin-tx release/ 2>/dev/null || true
-          cp src/qt/woxycoin-qt release/ 2>/dev/null || true
+          cp src/woxycoind release/ || true
+          cp src/woxycoin-cli release/ || true
+          cp src/woxycoin-tx release/ || true
+          strip release/* || true
           tar -czvf woxycoin-linux-x64.tar.gz -C release .
           
       - name: Upload Linux Build
@@ -44,48 +47,12 @@ jobs:
           name: woxycoin-linux-x64
           path: woxycoin-linux-x64.tar.gz
 
-  build-windows:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
-          sudo apt-get install -y g++-mingw-w64-x86-64 mingw-w64-x86-64-dev
-          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-          
-      - name: Build Windows dependencies
-        run: |
-          cd depends
-          make HOST=x86_64-w64-mingw32 -j$(nproc)
-          
-      - name: Build Windows
-        run: |
-          ./autogen.sh
-          CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/
-          make -j$(nproc)
-          
-      - name: Package
-        run: |
-          mkdir -p release
-          cp src/woxycoind.exe release/ 2>/dev/null || true
-          cp src/woxycoin-cli.exe release/ 2>/dev/null || true
-          cp src/woxycoin-tx.exe release/ 2>/dev/null || true
-          cp src/qt/woxycoin-qt.exe release/ 2>/dev/null || true
-          zip -r woxycoin-windows-x64.zip release/
-          
-      - name: Upload Windows Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: woxycoin-windows-x64
-          path: woxycoin-windows-x64.zip
-
   release:
-    needs: [build-linux, build-windows]
+    needs: [build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -95,6 +62,3 @@ jobs:
         with:
           files: |
             woxycoin-linux-x64/woxycoin-linux-x64.tar.gz
-            woxycoin-windows-x64/woxycoin-windows-x64.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
