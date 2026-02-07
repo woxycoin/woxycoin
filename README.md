@@ -1,116 +1,65 @@
 # Woxycoin (WOXY)
 
-A simple cryptocurrency you can mine on your computer.
+A simple cryptocurrency built on Litecoin codebase.
 
----
+## Quick Info
 
-## WINDOWS - Download & Mine in 2 Minutes
+| Property | Value |
+|----------|-------|
+| **Name** | Woxycoin |
+| **Symbol** | WOXY |
+| **Algorithm** | Scrypt |
+| **Block Time** | ~2.5 minutes |
+| **Block Reward** | 50 WOXY |
+| **P2P Port** | 9777 |
+| **RPC Port** | 9778 |
 
-### Step 1: Download
-Go to [Releases](https://github.com/woxycoin/woxycoin/releases) and download `woxycoin-windows.zip`
+## Building from Source
 
-### Step 2: Extract
-Unzip the file to a folder (example: `C:\Woxycoin`)
+### Linux (Ubuntu/Debian)
 
-### Step 3: Download Helper Scripts
-Download these 4 files from the [windows folder](https://github.com/woxycoin/woxycoin/tree/main/windows) and put them in the same folder:
-- `START.bat`
-- `MINE.bat`
-- `INFO.bat`
-- `STOP.bat`
-
-### Step 4: Run
-1. Double-click **START.bat** - wait 10 seconds
-2. Double-click **MINE.bat** - mining starts!
-3. Double-click **INFO.bat** - see your balance
-
-That's it!
-
----
-
-## LINUX - Download & Mine in 2 Minutes
-
-### Step 1: Download
 ```bash
-cd ~
-wget https://github.com/woxycoin/woxycoin/releases/latest/download/woxycoin-linux.tar.gz
-tar -xzf woxycoin-linux.tar.gz
-cd woxycoin-linux
+# Install dependencies
+sudo apt-get update
+sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config   libssl-dev libevent-dev libboost-all-dev libdb-dev libdb++-dev   libminiupnpc-dev libzmq3-dev qtbase5-dev qttools5-dev-tools libqrencode-dev
+
+# Clone and build
+git clone https://github.com/woxycoin/WoxyCoin.git
+cd WoxyCoin
+./autogen.sh
+./configure --with-gui=qt5 --with-incompatible-bdb
+make -j$(nproc)
 ```
 
-### Step 2: Start Node
+### Binaries Location
+
+After building:
+- `src/woxycoind` - Daemon
+- `src/woxycoin-cli` - CLI wallet
+- `src/qt/woxycoin-qt` - GUI wallet
+
+## Basic Commands
+
 ```bash
-./woxycoind -daemon
-```
-Wait 5 seconds.
+# Start daemon
+./src/woxycoind -daemon
 
-### Step 3: Mine
-```bash
-./woxycoin-cli generatetoaddress 1 $(./woxycoin-cli getnewaddress) 99999999
-```
+# Check block count
+./src/woxycoin-cli getblockcount
 
-### Step 4: Check Balance
-```bash
-./woxycoin-cli getbalance
-```
+# Get new address
+./src/woxycoin-cli getnewaddress
 
----
+# Mine blocks
+./src/woxycoin-cli generatetoaddress 1 YOUR_ADDRESS 99999999
 
-## Common Commands
+# Check balance
+./src/woxycoin-cli getbalance
 
-| What you want | Windows (in CMD) | Linux |
-|---------------|------------------|-------|
-| Start node | `START.bat` | `./woxycoind -daemon` |
-| Stop node | `STOP.bat` | `./woxycoin-cli stop` |
-| Mine 1 block | `MINE.bat` | `./woxycoin-cli generatetoaddress 1 $(./woxycoin-cli getnewaddress) 99999999` |
-| See balance | `INFO.bat` | `./woxycoin-cli getbalance` |
-| See block count | `INFO.bat` | `./woxycoin-cli getblockcount` |
-| Get new address | - | `./woxycoin-cli getnewaddress` |
-| List all addresses | - | `./woxycoin-cli listreceivedbyaddress 0 true` |
-| Send coins | - | `./woxycoin-cli sendtoaddress ADDRESS AMOUNT` |
-
----
-
-## See Your Addresses
-
-**Windows** (open CMD in your Woxycoin folder):
-```
-woxycoin-cli.exe -rpcport=9878 listreceivedbyaddress 0 true
+# Stop daemon
+./src/woxycoin-cli stop
 ```
 
-**Linux**:
-```bash
-./woxycoin-cli listreceivedbyaddress 0 true
-```
+## License
 
----
-
-## Coin Info
-
-| | |
-|---|---|
-| Name | Woxycoin |
-| Symbol | WOXY |
-| Block Time | 90 seconds |
-| Block Reward | 1 WOXY |
-| Algorithm | Scrypt |
-| P2P Port | 9777 (Linux) / 9877 (Windows) |
-| RPC Port | 9778 (Linux) / 9878 (Windows) |
-
----
-
-## Seed Node
-
-The official seed node is: `84.8.159.109`
-
-This is added automatically when you run START.bat or use the helper scripts.
-
----
-
-## Need Help?
-
-Open an issue: https://github.com/woxycoin/woxycoin/issues
-
----
-
-*Woxycoin - A New Beginning*
+MIT License - see [COPYING](COPYING)
