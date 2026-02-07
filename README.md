@@ -2,7 +2,29 @@
 
 A simple cryptocurrency built on Litecoin codebase.
 
-## Quick Info
+## Download
+
+**Linux:** [woxycoin-linux-x64.zip](https://github.com/woxycoin/WoxyCoin/releases/latest/download/woxycoin-linux-x64.zip)
+
+## Quick Start (Linux)
+
+```bash
+# Download and extract
+wget https://github.com/woxycoin/WoxyCoin/releases/latest/download/woxycoin-linux-x64.zip
+unzip woxycoin-linux-x64.zip
+cd woxycoin-linux-x64
+
+# Start daemon
+./woxycoind -daemon
+
+# Wait 5 seconds, then mine
+./woxycoin-cli generatetoaddress 1 $(./woxycoin-cli getnewaddress) 99999999
+
+# Check balance
+./woxycoin-cli getbalance
+```
+
+## Coin Info
 
 | Property | Value |
 |----------|-------|
@@ -14,52 +36,30 @@ A simple cryptocurrency built on Litecoin codebase.
 | **P2P Port** | 9777 |
 | **RPC Port** | 9778 |
 
-## Building from Source
+## Commands
 
-### Linux (Ubuntu/Debian)
+| Command | Description |
+|---------|-------------|
+| `./woxycoind -daemon` | Start node |
+| `./woxycoin-cli stop` | Stop node |
+| `./woxycoin-cli getblockcount` | Show block height |
+| `./woxycoin-cli getbalance` | Show balance |
+| `./woxycoin-cli getnewaddress` | Get new address |
+| `./woxycoin-cli generatetoaddress 1 ADDRESS 99999999` | Mine 1 block |
+
+## Build from Source
 
 ```bash
-# Install dependencies
 sudo apt-get update
-sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config   libssl-dev libevent-dev libboost-all-dev libdb-dev libdb++-dev   libminiupnpc-dev libzmq3-dev qtbase5-dev qttools5-dev-tools libqrencode-dev
+sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config   libssl-dev libevent-dev libboost-all-dev libdb-dev libdb++-dev   libminiupnpc-dev libzmq3-dev libfmt-dev libsqlite3-dev
 
-# Clone and build
 git clone https://github.com/woxycoin/WoxyCoin.git
 cd WoxyCoin
 ./autogen.sh
-./configure --with-gui=qt5 --with-incompatible-bdb
+./configure --with-incompatible-bdb
 make -j$(nproc)
-```
-
-### Binaries Location
-
-After building:
-- `src/woxycoind` - Daemon
-- `src/woxycoin-cli` - CLI wallet
-- `src/qt/woxycoin-qt` - GUI wallet
-
-## Basic Commands
-
-```bash
-# Start daemon
-./src/woxycoind -daemon
-
-# Check block count
-./src/woxycoin-cli getblockcount
-
-# Get new address
-./src/woxycoin-cli getnewaddress
-
-# Mine blocks
-./src/woxycoin-cli generatetoaddress 1 YOUR_ADDRESS 99999999
-
-# Check balance
-./src/woxycoin-cli getbalance
-
-# Stop daemon
-./src/woxycoin-cli stop
 ```
 
 ## License
 
-MIT License - see [COPYING](COPYING)
+MIT License
