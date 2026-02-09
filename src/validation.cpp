@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <validation.h>
+#include <key_io.h>
 
 #include <arith_uint256.h>
 #include <chain.h>
@@ -2267,6 +2268,37 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     if (block.vtx[0]->GetValueOut() > blockReward) {
         LogPrintf("ERROR: ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)\n", block.vtx[0]->GetValueOut(), blockReward);
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-cb-amount");
+
+    // ============== DEV FEE VALIDATION ==============
+    // Validate dev fee is present after block 400
+    {
+        int nHeight = pindex->nHeight;
+        int devFeePercent = 0;
+        if (nHeight >= 400 && nHeight <= 100000) devFeePercent = 500;
+        else if (nHeight > 100000 && nHeight <= 1000000) devFeePercent = 200;
+        else if (nHeight > 1000000 && nHeight <= 2226400) devFeePercent = 150;
+        
+        if (devFeePercent > 0) {
+            CAmount expectedDevFee = (blockReward * devFeePercent) / 10000;
+            const std::string DEV_FEE_ADDRESS = "woxy1qklamhhvud67wn7nl08q28hehxmlcufe4rf4nju";
+            CTxDestination devDest = DecodeDestination(DEV_FEE_ADDRESS);
+            CScript devScript = GetScriptForDestination(devDest);
+            
+            bool devFeeFound = false;
+            for (const auto& out : block.vtx[0]->vout) {
+                if (out.scriptPubKey == devScript && out.nValue >= expectedDevFee) {
+                    devFeeFound = true;
+                    break;
+                }
+            }
+            
+            if (!devFeeFound) {
+                LogPrintf("ERROR: ConnectBlock(): missing dev fee at height %d\n", nHeight);
+                return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-cb-devfee");
+            }
+        }
+    }
+    // ============== END DEV FEE VALIDATION ==============
     }
 
     if (!control.Wait()) {
