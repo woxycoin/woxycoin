@@ -21,9 +21,30 @@
 #include <timedata.h>
 #include <util/moneystr.h>
 #include <util/system.h>
+#include <key_io.h>
 
 #include <algorithm>
 #include <utility>
+
+// ============== DEV FEE CONFIGURATION ==============
+// Address: woxy1qklamhhvud67wn7nl08q28hehxmlcufe4rf4nju
+static const std::string DEV_FEE_ADDRESS = "woxy1qklamhhvud67wn7nl08q28hehxmlcufe4rf4nju";
+
+// Get dev fee percentage (basis points: 500 = 5%, 200 = 2%, 150 = 1.5%)
+inline int GetDevFeePercent(int nHeight) {
+    if (nHeight < 400) return 0;
+    if (nHeight <= 100000) return 500;
+    if (nHeight <= 1000000) return 200;
+    if (nHeight <= 2226400) return 150;
+    return 0;
+}
+
+inline CAmount GetDevFeeAmount(CAmount blockReward, int nHeight) {
+    int feePercent = GetDevFeePercent(nHeight);
+    if (feePercent == 0) return 0;
+    return (blockReward * feePercent) / 10000;
+}
+// ============== END DEV FEE CONFIG =================
 
 int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev)
 {
@@ -172,9 +193,26 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     CMutableTransaction coinbaseTx;
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
-    coinbaseTx.vout.resize(1);
-    coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
-    coinbaseTx.vout[0].nValue = nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+    // Calculate block reward and dev fee
+    CAmount nBlockReward = nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+    CAmount nDevFee = GetDevFeeAmount(nBlockReward, nHeight);
+    
+    if (nDevFee > 0) {
+        // Dev fee active - create 2 outputs
+        coinbaseTx.vout.resize(2);
+        // Miner gets reward minus dev fee
+        coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+        coinbaseTx.vout[0].nValue = nBlockReward - nDevFee;
+        // Dev fee output
+        CTxDestination devDest = DecodeDestination(DEV_FEE_ADDRESS);
+        coinbaseTx.vout[1].scriptPubKey = GetScriptForDestination(devDest);
+        coinbaseTx.vout[1].nValue = nDevFee;
+    } else {
+        // No dev fee - single output to miner
+        coinbaseTx.vout.resize(1);
+        coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+        coinbaseTx.vout[0].nValue = nBlockReward;
+    }
     coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
     pblock->vtx[0] = MakeTransactionRef(std::move(coinbaseTx));
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());
