@@ -32,7 +32,7 @@ static const std::string DEV_FEE_ADDRESS = "woxy1qklamhhvud67wn7nl08q28hehxmlcuf
 
 // Get dev fee percentage (basis points: 500 = 5%, 200 = 2%, 150 = 1.5%)
 inline int GetDevFeePercent(int nHeight) {
-    if (nHeight < 400) return 0;
+    if (nHeight < 2016) return 0;
     if (nHeight <= 100000) return 500;
     if (nHeight <= 1000000) return 200;
     if (nHeight <= 2226400) return 150;
