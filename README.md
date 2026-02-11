@@ -30,7 +30,7 @@ A community-driven cryptocurrency. Part of the Woxy Group ecosystem.
 
 | Platform | Link |
 |----------|------|
-| Linux (CLI) | [woxycoin-linux-x64.zip](https://github.com/woxycoin/WoxyCoin/releases/latest) |
+| Linux (CLI) | [woxycoin-v1.1.1-linux-x64.tar.gz](https://github.com/woxycoin/WoxyCoin/releases/download/v1.1.1/woxycoin-v1.1.1-linux-x64.tar.gz) |
 | Windows | Coming soon |
 | GUI Wallet | Coming soon |
 
