@@ -2268,6 +2268,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     if (block.vtx[0]->GetValueOut() > blockReward) {
         LogPrintf("ERROR: ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)\n", block.vtx[0]->GetValueOut(), blockReward);
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-cb-amount");
+    }
 
     // ============== DEV FEE VALIDATION ==============
     // Validate dev fee is present after block 400
@@ -2299,7 +2300,6 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
         }
     }
     // ============== END DEV FEE VALIDATION ==============
-    }
 
     if (!control.Wait()) {
         LogPrintf("ERROR: %s: CheckQueue failed\n", __func__);
