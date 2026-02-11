@@ -2271,11 +2271,11 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     }
 
     // ============== DEV FEE VALIDATION ==============
-    // Validate dev fee is present after block 400
+    // Validate dev fee is present after block 2016
     {
         int nHeight = pindex->nHeight;
         int devFeePercent = 0;
-        if (nHeight >= 400 && nHeight <= 100000) devFeePercent = 500;
+        if (nHeight >= 2016 && nHeight <= 100000) devFeePercent = 500;
         else if (nHeight > 100000 && nHeight <= 1000000) devFeePercent = 200;
         else if (nHeight > 1000000 && nHeight <= 2226400) devFeePercent = 150;
         
