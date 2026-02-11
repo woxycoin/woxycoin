@@ -1,3 +1,4 @@
+
 name: Build Woxycoin
 
 on:
@@ -13,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -22,43 +23,140 @@ jobs:
           sudo apt-get install -y libdb-dev libdb++-dev libsqlite3-dev
           sudo apt-get install -y libminiupnpc-dev libzmq3-dev libfmt-dev
           sudo apt-get install -y qtbase5-dev qttools5-dev-tools qttools5-dev libqrencode-dev
-          
+
       - name: Autogen
         run: ./autogen.sh
-          
+
       - name: Configure
         run: ./configure --with-gui=qt5 --with-incompatible-bdb --disable-tests --disable-bench
-          
+
       - name: Build
         run: make -j$(nproc)
-          
+
       - name: Package
         run: |
           mkdir -p release
           cp src/woxycoind release/ || true
           cp src/woxycoin-cli release/ || true
           cp src/woxycoin-tx release/ || true
+          cp src/qt/woxycoin-qt release/ || true
           strip release/* || true
-          tar -czvf woxycoin-linux-x64.tar.gz -C release .
-          
+          tar -czvf woxycoin-${{ github.ref_name }}-linux-x64.tar.gz -C release .
+
       - name: Upload Linux Build
         uses: actions/upload-artifact@v4
         with:
           name: woxycoin-linux-x64
-          path: woxycoin-linux-x64.tar.gz
+          path: woxycoin-${{ github.ref_name }}-linux-x64.tar.gz
+
+  build-windows:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
+          sudo apt-get install -y g++-mingw-w64-x86-64 mingw-w64-x86-64-dev
+          sudo apt-get install -y curl
+
+      - name: Set MinGW compiler
+        run: |
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+
+      - name: Build depends
+        run: |
+          cd depends
+          make HOST=x86_64-w64-mingw32 -j$(nproc) NO_QT=1
+
+      - name: Autogen
+        run: ./autogen.sh
+
+      - name: Configure
+        run: |
+          CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --disable-tests --disable-bench --without-gui
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Package
+        run: |
+          mkdir -p release
+          cp src/woxycoind.exe release/ || true
+          cp src/woxycoin-cli.exe release/ || true
+          cp src/woxycoin-tx.exe release/ || true
+          x86_64-w64-mingw32-strip release/*.exe || true
+          zip -r woxycoin-${{ github.ref_name }}-win64.zip release/
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: woxycoin-win64
+          path: woxycoin-${{ github.ref_name }}-win64.zip
+
+  build-macos:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install automake libtool boost pkg-config libevent berkeley-db@4 qt@5 miniupnpc libnatpmp zeromq fmt qrencode
+
+      - name: Autogen
+        run: ./autogen.sh
+
+      - name: Configure
+        run: |
+          export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export PATH="/usr/local/opt/qt@5/bin:$PATH"
+          ./configure --with-gui=qt5 --disable-tests --disable-bench \
+            BDB_LIBS="-L/usr/local/opt/berkeley-db@4/lib -ldb_cxx-4.8" \
+            BDB_CFLAGS="-I/usr/local/opt/berkeley-db@4/include"
+
+      - name: Build
+        run: make -j$(sysctl -n hw.ncpu)
+
+      - name: Package
+        run: |
+          mkdir -p release
+          cp src/woxycoind release/ || true
+          cp src/woxycoin-cli release/ || true
+          cp src/woxycoin-tx release/ || true
+          cp src/qt/woxycoin-qt release/ || true
+          strip release/* || true
+          tar -czvf woxycoin-${{ github.ref_name }}-macos-x64.tar.gz -C release .
+
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: woxycoin-macos-x64
+          path: woxycoin-${{ github.ref_name }}-macos-x64.tar.gz
 
   release:
-    needs: [build-linux]
+    needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
-        
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            woxycoin-linux-x64/woxycoin-linux-x64.tar.gz
+            woxycoin-linux-x64/*.tar.gz
+            woxycoin-win64/*.zip
+            woxycoin-macos-x64/*.tar.gz
+          body: |
+            ## Downloads
+            - **Linux**: woxycoin-${{ github.ref_name }}-linux-x64.tar.gz
+            - **Windows**: woxycoin-${{ github.ref_name }}-win64.zip
+            - **macOS**: woxycoin-${{ github.ref_name }}-macos-x64.tar.gz
+
+            ## Verification
+            SHA256 checksums will be added after build completes.
