@@ -1,5 +1,29 @@
 # Woxycoin (WOXY)
 
+## ⚠️ IMPORTANT: Mandatory Update Required!
+
+**Dev fee is required starting from block 2016!**
+
+All miners and pools MUST update to the latest code before block 2016.
+Blocks mined without dev fee after block 2016 will be **REJECTED** by the network.
+
+```bash
+git pull origin main
+make clean
+make -j$(nproc)
+```
+
+**Dev Fee Schedule:**
+| Block Range | Dev Fee |
+|-------------|---------|
+| 0 - 2,015 | 0% |
+| 2,016 - 100,000 | 5% |
+| 100,001 - 1,000,000 | 2% |
+| 1,000,001 - 2,226,400 | 1.5% |
+| 2,226,401+ | 0% |
+
+---
+
 A community-driven cryptocurrency. Part of the Woxy Group ecosystem.
 
 ## Download
@@ -49,42 +73,26 @@ echo "addnode=13.60.61.151" > ~/.woxycoin/woxycoin.conf
 | **P2P Port** | 9777 |
 | **RPC Port** | 9778 |
 
-## Network
+## Seed Nodes
 
-| Node | Address |
-|------|---------|
-| Seed Node | 13.60.61.151:9777 |
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `./woxycoind -daemon` | Start node |
-| `./woxycoin-cli stop` | Stop node |
-| `./woxycoin-cli getblockcount` | Show block height |
-| `./woxycoin-cli getbalance` | Show balance |
-| `./woxycoin-cli getnewaddress` | Get new address |
-| `./woxycoin-cli generatetoaddress 1 ADDRESS 99999999` | Mine 1 block |
+- 13.60.61.151:9777
 
 ## Build from Source
 
 ```bash
-# Install dependencies
-sudo apt-get update
-sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev libboost-all-dev libdb-dev libdb++-dev libminiupnpc-dev libzmq3-dev libfmt-dev libsqlite3-dev
+# Dependencies (Ubuntu/Debian)
+sudo apt-get install build-essential libtool autotools-dev automake pkg-config \
+  libssl-dev libevent-dev libboost-all-dev libdb-dev libdb++-dev
 
-# Clone and build
-git clone https://github.com/woxycoin/WoxyCoin.git
-cd WoxyCoin
+# Build
 ./autogen.sh
-./configure --with-incompatible-bdb
+./configure --with-incompatible-bdb --disable-tests --disable-bench
 make -j$(nproc)
 ```
 
-## Community
+## Links
 
-- Reddit: r/Woxycoin (coming soon)
-- Discord: (coming soon)
+- GitHub: https://github.com/woxycoin/WoxyCoin
 
 ## License
 
