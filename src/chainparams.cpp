@@ -120,6 +120,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
+        vSeeds.emplace_back("seed.woxycoin.org");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,73);  // W...
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,75);  // X...
@@ -208,6 +209,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
+        vSeeds.emplace_back("seed.woxycoin.org");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
@@ -297,7 +299,8 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x076110288ba77192bd351832c4549c9bf52dd090d8fc67ad838fa1e2e76f2dca"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
-        vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
+        vSeeds.clear();
+        vSeeds.emplace_back("seed.woxycoin.org");      //!< Regtest mode doesn't have any DNS seeds.
 
         fDefaultConsistencyChecks = true;
         fRequireStandard = true;
