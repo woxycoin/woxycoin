@@ -118,9 +118,11 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x6ba20f9f8a32a60f6479eeac98b18784d9fd6eefe48de55aa25be3804c2a93fc"));
         assert(genesis.hashMerkleRoot == uint256S("0x076110288ba77192bd351832c4549c9bf52dd090d8fc67ad838fa1e2e76f2dca"));
 
-        vFixedSeeds.clear();
         vSeeds.clear();
         vSeeds.emplace_back("seed.woxycoin.org");
+
+        // Fixed seed node (AWS Stockholm) - IP: 13.51.55.67
+        vFixedSeeds.clear();
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,73);  // W...
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,75);  // X...
