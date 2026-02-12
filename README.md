@@ -38,7 +38,7 @@ cd woxycoin-linux-x64
 
 # Create config with seed node
 mkdir -p ~/.woxycoin
-echo "addnode=seed.woxycoin.org" > ~/.woxycoin/woxycoin.conf
+echo -e "addnode=seed.woxycoin.org\naddnode=13.51.55.67" > ~/.woxycoin/woxycoin.conf
 
 # Start daemon
 ./woxycoind -daemon
@@ -70,7 +70,8 @@ echo "addnode=seed.woxycoin.org" > ~/.woxycoin/woxycoin.conf
 
 ## Seed Nodes
 
-- 13.60.61.151:9777
+- **DNS:** seed.woxycoin.org
+- **IP:** 13.51.55.67:9777
 
 ## Build from Source
 
