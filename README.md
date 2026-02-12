@@ -30,7 +30,7 @@ A community-driven cryptocurrency. Part of the Woxy Group ecosystem.
 
 | Platform | Link |
 |----------|------|
-| Linux (CLI) | [woxycoin-v1.1.1-linux-x64.tar.gz](https://github.com/woxycoin/WoxyCoin/releases/download/v1.1.1/woxycoin-v1.1.1-linux-x64.tar.gz) |
+| Linux (CLI) | [woxycoin-linux-x64.tar.gz](https://github.com/woxycoin/WoxyCoin/releases/download/v1.2.0/woxycoin-linux-x64.tar.gz) |
 | Windows | Coming soon |
 | GUI Wallet | Coming soon |
 
@@ -43,7 +43,7 @@ cd woxycoin-linux-x64
 
 # Create config with seed node
 mkdir -p ~/.woxycoin
-echo "addnode=13.60.61.151" > ~/.woxycoin/woxycoin.conf
+echo "addnode=seed.woxycoin.org" > ~/.woxycoin/woxycoin.conf
 
 # Start daemon
 ./woxycoind -daemon
