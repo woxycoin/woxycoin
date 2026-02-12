@@ -1,11 +1,6 @@
 # Woxycoin (WOXY)
 
-## ⚠️ IMPORTANT: Mandatory Update Required!
 
-**Dev fee is required starting from block 2016!**
-
-All miners and pools MUST update to the latest code before block 2016.
-Blocks mined without dev fee after block 2016 will be **REJECTED** by the network.
 
 ```bash
 git pull origin main
