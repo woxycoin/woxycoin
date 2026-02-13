@@ -89,6 +89,8 @@ make -j$(nproc)
 
 ## Links
 
+- **Block Explorer:** http://explorer.woxycoin.org
+
 - GitHub: https://github.com/woxycoin/WoxyCoin
 
 ## License
