@@ -1,5 +1,3 @@
-# Woxycoin (WOXY)
-> **IMPORTANT: Seed node IP has changed to 13.51.55.67:9777. Update your woxycoin.conf: addnode=13.51.55.67**
 
 
 
