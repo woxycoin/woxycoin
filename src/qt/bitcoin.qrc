@@ -2,6 +2,7 @@
     <qresource prefix="/icons">
         <file alias="bitcoin">res/icons/bitcoin.png</file>
         <file alias="woxycoin_splash">res/icons/woxycoin_splash.png</file>
+        <!-- Woxycoin branding assets are generated from the official logo. -->
         <file alias="address-book">res/icons/address-book.png</file>
         <file alias="send">res/icons/send.png</file>
         <file alias="connect_0">res/icons/connect0.png</file>

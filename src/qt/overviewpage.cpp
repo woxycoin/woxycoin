@@ -146,6 +146,18 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
 {
     ui->setupUi(this);
 
+    // Brand the global alert bar (color + readability on dark themes).
+    ui->labelAlerts->setStyleSheet(
+        "QLabel { "
+        "background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, "
+        "stop:0 rgba(127,0,255,90), stop:1 rgba(0,255,153,90)); "
+        "color:#ffffff; "
+        "border: 1px solid rgba(127,0,255,130); "
+        "border-radius: 8px; "
+        "padding: 6px; "
+        "}"
+    );
+
     m_balances.balance = -1;
 
     // use a SingleColorIcon for the "out of sync warning" icon

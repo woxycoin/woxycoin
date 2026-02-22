@@ -54,17 +54,22 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     pixmap.setDevicePixelRatio(devicePixelRatio);
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    const QRect rGradient(QPoint(0, 0), splashSize);
 
-    // draw a slightly radial gradient
-    QRadialGradient gradient(QPoint(0,0), splashSize.width()/devicePixelRatio);
-    gradient.setColorAt(0, Qt::white);
-    gradient.setColorAt(1, QColor(247,247,247));
-    QRect rGradient(QPoint(0,0), splashSize);
-    pixPaint.fillRect(rGradient, gradient);
+    // Background
+    QPixmap bg(":/icons/woxycoin_splash");
+    if (!bg.isNull()) {
+        pixPaint.drawPixmap(rGradient, bg.scaled(splashSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    } else {
+        // Fallback if the splash image can't be loaded.
+        QRadialGradient gradient(QPoint(0, 0), splashSize.width() / devicePixelRatio);
+        gradient.setColorAt(0, Qt::white);
+        gradient.setColorAt(1, QColor(247, 247, 247));
+        pixPaint.fillRect(rGradient, gradient);
+    }
 
     // draw the bitcoin icon, expected size of PNG: 1024x1024
-    QRect rectIcon(QPoint(-70,-30), QSize(300,300));
+    QRect rectIcon(QPoint(18, 28), QSize(250, 250));
 
     const QSize requiredSize(1024,1024);
     QPixmap icon(networkStyle->getAppIcon().pixmap(requiredSize));
@@ -72,6 +77,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     pixPaint.drawPixmap(rectIcon, icon);
 
     // check font size and drawing with
+    pixPaint.setPen(QColor(240, 240, 240));
     pixPaint.setFont(QFont(font, 33*fontFactor));
     QFontMetrics fm = pixPaint.fontMetrics();
     int titleTextWidth = GUIUtil::TextWidth(fm, titleText);
@@ -84,6 +90,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     titleTextWidth  = GUIUtil::TextWidth(fm, titleText);
     pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight,paddingTop,titleText);
 
+    pixPaint.setPen(QColor(205, 205, 205));
     pixPaint.setFont(QFont(font, 13*fontFactor));
 
     // if the version string is too long, reduce size
@@ -98,6 +105,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     // draw copyright stuff
     {
         pixPaint.setFont(QFont(font, 13*fontFactor));
+        pixPaint.setPen(QColor(175, 175, 175));
         const int x = pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight;
         const int y = paddingTop+titleCopyrightVSpace;
         QRect copyrightRect(x, y, pixmap.width() - x, pixmap.height() - y);
@@ -109,6 +117,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
         QFont boldFont = QFont(font, 13*fontFactor);
         boldFont.setWeight(QFont::Bold);
         pixPaint.setFont(boldFont);
+        pixPaint.setPen(QColor(0, 255, 153));
         fm = pixPaint.fontMetrics();
         int titleAddTextWidth  = GUIUtil::TextWidth(fm, titleAddText);
         pixPaint.drawText(pixmap.width()/devicePixelRatio-titleAddTextWidth-10,15,titleAddText);
@@ -175,7 +184,7 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
         Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(55,55,55)));
+        Q_ARG(QColor, QColor(220, 220, 220)));
     assert(invoked);
 }
 

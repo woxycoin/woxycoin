@@ -31,11 +31,8 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
 {
     // load pixmap
     QPixmap pixmap;
-    if (std::char_traits<char>::length(_titleAddText) == 0) {
-        pixmap.load(":/icons/bitcoin");
-    } else {
-        pixmap.load(":/icons/woxycoin_splash");
-    }
+    // Base icon for all networks (network-specific coloring is applied below).
+    pixmap.load(":/icons/bitcoin");
 
     if(iconColorHueShift != 0 && iconColorSaturationReduction != 0)
     {
@@ -80,7 +77,7 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
     }
 
     appIcon             = QIcon(pixmap);
-    trayAndWindowIcon   = QIcon(pixmap.scaled(QSize(256,256)));
+    trayAndWindowIcon   = QIcon(pixmap.scaled(QSize(256,256), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 const NetworkStyle* NetworkStyle::instantiate(const std::string& networkId)

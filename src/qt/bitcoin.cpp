@@ -43,11 +43,13 @@
 #include <memory>
 
 #include <QApplication>
+#include <QPalette>
 #include <QDebug>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QMessageBox>
 #include <QSettings>
+#include <QStyleFactory>
 #include <QThread>
 #include <QTimer>
 #include <QTranslator>
@@ -85,6 +87,348 @@ static void RegisterMetaTypes()
     qRegisterMetaType<std::function<void()>>("std::function<void()>");
     qRegisterMetaType<QMessageBox::Icon>("QMessageBox::Icon");
     qRegisterMetaType<interfaces::BlockAndHeaderTipInfo>("interfaces::BlockAndHeaderTipInfo");
+}
+
+static void ApplyWoxyTheme()
+{
+    // Make theme application deterministic across platforms.
+    if (QStyle* fusion = QStyleFactory::create("Fusion")) {
+        QApplication::setStyle(fusion);
+    }
+
+    const QColor bg0(13, 5, 32);      // #0d0520
+    const QColor bg1(26, 9, 56);      // #1a0938
+    const QColor base(17, 6, 40);     // #110628
+    const QColor text(235, 235, 235);
+    const QColor muted(170, 170, 170);
+    const QColor purple(127, 0, 255); // #7F00FF
+    const QColor green(0, 255, 153);  // #00ff99
+
+    QPalette p;
+    p.setColor(QPalette::Window, bg0);
+    p.setColor(QPalette::WindowText, text);
+    p.setColor(QPalette::Base, base);
+    p.setColor(QPalette::AlternateBase, bg1);
+    p.setColor(QPalette::ToolTipBase, bg1);
+    p.setColor(QPalette::ToolTipText, text);
+    p.setColor(QPalette::Text, text);
+    p.setColor(QPalette::Button, bg1);
+    p.setColor(QPalette::ButtonText, text);
+    p.setColor(QPalette::BrightText, QColor(255, 77, 77));
+    p.setColor(QPalette::Link, green);
+
+    // Use neon green as the selection/highlight color so PlatformStyle can colorize icons accordingly.
+    p.setColor(QPalette::Highlight, green);
+    p.setColor(QPalette::HighlightedText, bg0);
+
+    // Disabled state
+    p.setColor(QPalette::Disabled, QPalette::WindowText, muted.darker(130));
+    p.setColor(QPalette::Disabled, QPalette::Text, muted.darker(130));
+    p.setColor(QPalette::Disabled, QPalette::ButtonText, muted.darker(130));
+
+    QApplication::setPalette(p);
+
+    // QSS brings the "from the future" look while staying readable/practical.
+    qApp->setStyleSheet(QString::fromUtf8(R"QSS(
+/* ===== WOXY FUTURE THEME ===== */
+
+QWidget {
+  selection-background-color: rgba(0, 255, 153, 80);
+  selection-color: #0d0520;
+}
+
+QMainWindow, QDialog, QMessageBox {
+  background-color: #0d0520;
+}
+
+/* Menus */
+QMenuBar {
+  background: rgba(13, 5, 32, 235);
+  border-bottom: 1px solid rgba(127, 0, 255, 80);
+}
+QMenuBar::item {
+  padding: 6px 10px;
+  margin: 4px 2px;
+  border-radius: 8px;
+  background: transparent;
+}
+QMenuBar::item:selected {
+  background: rgba(127, 0, 255, 35);
+  border: 1px solid rgba(127, 0, 255, 80);
+}
+QMenu {
+  background-color: #0d0520;
+  border: 1px solid rgba(127, 0, 255, 120);
+  padding: 6px;
+}
+QMenu::item {
+  padding: 6px 22px;
+  border-radius: 8px;
+}
+QMenu::item:selected {
+  background: rgba(0, 255, 153, 45);
+  border: 1px solid rgba(0, 255, 153, 130);
+}
+
+/* Toolbar navigation */
+QToolBar {
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(127, 0, 255, 45),
+    stop:0.5 rgba(0, 255, 153, 18),
+    stop:1 rgba(127, 0, 255, 45));
+  border-bottom: 1px solid rgba(127, 0, 255, 90);
+  spacing: 6px;
+  padding: 8px;
+}
+QToolButton {
+  color: rgba(235, 235, 235, 220);
+  background: rgba(255, 255, 255, 8);
+  border: 1px solid rgba(127, 0, 255, 75);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+QToolButton:hover {
+  background: rgba(127, 0, 255, 22);
+  border-color: rgba(0, 255, 153, 155);
+}
+QToolButton:checked {
+  color: #00ff99;
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(0, 255, 153, 26),
+    stop:1 rgba(127, 0, 255, 22));
+  border: 1px solid rgba(0, 255, 153, 200);
+}
+QToolButton:checked:hover {
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(0, 255, 153, 34),
+    stop:1 rgba(127, 0, 255, 30));
+}
+
+/* Tabs */
+QTabWidget::pane {
+  border: 1px solid rgba(127, 0, 255, 75);
+  border-radius: 14px;
+  top: -1px;
+  background: rgba(255, 255, 255, 3);
+}
+QTabBar::tab {
+  background: rgba(255, 255, 255, 6);
+  border: 1px solid rgba(127, 0, 255, 75);
+  border-bottom: 0;
+  padding: 8px 12px;
+  margin-right: 4px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+QTabBar::tab:selected {
+  color: #00ff99;
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(0, 255, 153, 26),
+    stop:1 rgba(127, 0, 255, 22));
+  border: 1px solid rgba(0, 255, 153, 200);
+}
+QTabBar::tab:!selected:hover {
+  background: rgba(127, 0, 255, 18);
+  border-color: rgba(0, 255, 153, 120);
+}
+
+/* Inputs */
+QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+  background-color: rgba(255, 255, 255, 8);
+  border: 1px solid rgba(127, 0, 255, 85);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {
+  border: 1px solid rgba(0, 255, 153, 210);
+}
+QComboBox::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  width: 28px;
+  border-left: 1px solid rgba(127, 0, 255, 85);
+}
+
+/* Buttons */
+QPushButton {
+  color: rgba(235, 235, 235, 230);
+  background: rgba(255, 255, 255, 10);
+  border: 1px solid rgba(127, 0, 255, 90);
+  border-radius: 10px;
+  padding: 7px 12px;
+}
+QPushButton:hover {
+  background: rgba(127, 0, 255, 22);
+  border-color: rgba(0, 255, 153, 175);
+}
+QPushButton:pressed {
+  background: rgba(0, 255, 153, 18);
+  border-color: rgba(0, 255, 153, 225);
+}
+QPushButton:default {
+  color: #0d0520;
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(0, 255, 153, 220),
+    stop:1 rgba(127, 0, 255, 200));
+  border: 1px solid rgba(0, 255, 153, 220);
+}
+QPushButton:disabled {
+  color: rgba(235, 235, 235, 120);
+  background: rgba(255, 255, 255, 5);
+  border-color: rgba(127, 0, 255, 45);
+}
+QPushButton[flat="true"] {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+/* Panels / "glass" cards */
+QGroupBox {
+  border: 1px solid rgba(127, 0, 255, 70);
+  border-radius: 14px;
+  margin-top: 16px;
+  padding: 12px;
+}
+QGroupBox::title {
+  subcontrol-origin: margin;
+  subcontrol-position: top left;
+  left: 12px;
+  padding: 0 6px;
+  color: #00ff99;
+  background: #0d0520;
+}
+QFrame[frameShape="6"] {
+  background: rgba(255, 255, 255, 4);
+  border: 1px solid rgba(127, 0, 255, 65);
+  border-radius: 14px;
+}
+QFrame[frameShape="4"] {
+  border: 0;
+  background: rgba(127, 0, 255, 30);
+  max-height: 1px;
+}
+QFrame[frameShape="5"] {
+  border: 0;
+  background: rgba(127, 0, 255, 30);
+  max-width: 1px;
+}
+
+/* Tables / lists */
+QHeaderView::section {
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(127, 0, 255, 55),
+    stop:1 rgba(0, 255, 153, 20));
+  color: rgba(235, 235, 235, 220);
+  padding: 7px 10px;
+  border: 0;
+  border-bottom: 1px solid rgba(127, 0, 255, 95);
+  border-right: 1px solid rgba(127, 0, 255, 35);
+}
+QTableView, QTreeView, QListView {
+  background: rgba(255, 255, 255, 4);
+  alternate-background-color: rgba(127, 0, 255, 12);
+  selection-background-color: rgba(0, 255, 153, 80);
+  selection-color: #0d0520;
+  border: 1px solid rgba(127, 0, 255, 75);
+  border-radius: 14px;
+  gridline-color: rgba(127, 0, 255, 30);
+  padding: 4px;
+}
+QTableView::item, QTreeView::item, QListView::item {
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+QTableView::item:selected, QTreeView::item:selected, QListView::item:selected {
+  background: rgba(0, 255, 153, 80);
+  border: 1px solid rgba(0, 255, 153, 140);
+}
+
+/* Progress */
+QProgressBar {
+  color: rgba(235, 235, 235, 210);
+  background: rgba(255, 255, 255, 6);
+  border: 1px solid rgba(127, 0, 255, 95);
+  border-radius: 9px;
+  padding: 1px;
+  text-align: center;
+}
+QProgressBar::chunk {
+  border-radius: 9px;
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 #7F00FF,
+    stop:1 #00ff99);
+}
+
+/* Scrollbars */
+QScrollBar:vertical {
+  background: rgba(255, 255, 255, 5);
+  width: 10px;
+  margin: 6px 3px 6px 3px;
+  border-radius: 5px;
+}
+QScrollBar::handle:vertical {
+  background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(127, 0, 255, 190),
+    stop:1 rgba(0, 255, 153, 190));
+  min-height: 30px;
+  border-radius: 5px;
+}
+QScrollBar::handle:vertical:hover {
+  background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(127, 0, 255, 225),
+    stop:1 rgba(0, 255, 153, 225));
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+
+QScrollBar:horizontal {
+  background: rgba(255, 255, 255, 5);
+  height: 10px;
+  margin: 3px 6px 3px 6px;
+  border-radius: 5px;
+}
+QScrollBar::handle:horizontal {
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(127, 0, 255, 190),
+    stop:1 rgba(0, 255, 153, 190));
+  min-width: 30px;
+  border-radius: 5px;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0; }
+
+/* Checkboxes / radios */
+QCheckBox::indicator, QRadioButton::indicator {
+  width: 16px;
+  height: 16px;
+}
+QCheckBox::indicator {
+  border: 1px solid rgba(127, 0, 255, 130);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 5);
+}
+QCheckBox::indicator:checked {
+  border: 1px solid rgba(0, 255, 153, 220);
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 rgba(0, 255, 153, 225),
+    stop:1 rgba(127, 0, 255, 205));
+}
+QRadioButton::indicator {
+  border: 1px solid rgba(127, 0, 255, 130);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 5);
+}
+QRadioButton::indicator:checked {
+  border: 1px solid rgba(0, 255, 153, 220);
+  background: rgba(0, 255, 153, 220);
+}
+
+/* Tooltips */
+QToolTip {
+  color: #f0f0f0;
+  background-color: #1a0938;
+  border: 1px solid rgba(127, 0, 255, 160);
+}
+)QSS"));
 }
 
 static QString GetLangTerritory()
@@ -434,6 +778,7 @@ static void SetupUIArgs(ArgsManager& argsman)
     argsman.AddArg("-min", "Start minimized", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
     argsman.AddArg("-resetguisettings", "Reset all settings changed in the GUI", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
     argsman.AddArg("-splash", strprintf("Show splash screen on startup (default: %u)", DEFAULT_SPLASHSCREEN), ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
+    argsman.AddArg("-woxytheme", "Enable futuristic Woxy UI theme (default: 1)", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
     argsman.AddArg("-uiplatform", strprintf("Select platform to customize UI for (one of windows, macosx, other; default: %s)", BitcoinGUI::DEFAULT_UIPLATFORM), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::GUI);
 }
 
@@ -467,7 +812,6 @@ int GuiMain(int argc, char* argv[])
 #endif
 
     BitcoinApplication app;
-
     /// 2. Parse command-line options. We do this after qt in order to show an error if there are problems parsing these
     // Command-line options take precedence:
     SetupServerArgs(node_context);
@@ -480,6 +824,11 @@ int GuiMain(int argc, char* argv[])
             // message can not be translated because translations have not been initialized
             QString::fromStdString("Error parsing command line arguments: %1.").arg(QString::fromStdString(error)));
         return EXIT_FAILURE;
+    }
+
+    const bool use_woxy_theme = gArgs.GetBoolArg("-woxytheme", true);
+    if (use_woxy_theme) {
+        ApplyWoxyTheme();
     }
 
     // Now that the QApplication is setup and we have parsed our parameters, we can set the platform style
