@@ -98,6 +98,7 @@ public:
 
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
+        consensus.nEDAHeight = 0;  // Emergency Difficulty Adjustment active from genesis
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -194,6 +195,7 @@ public:
 
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
+        consensus.nEDAHeight = 0;  // Emergency Difficulty Adjustment active from genesis
 
         pchMessageStart[0] = 0xf2;
         pchMessageStart[1] = 0xc7;
@@ -283,6 +285,8 @@ public:
 
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
+        consensus.nEDAHeight = 0;
+        consensus.nEDAHeight = 0;  // Emergency Difficulty Adjustment active from genesis
 
         pchMessageStart[0] = 0xf3;
         pchMessageStart[1] = 0xc7;
