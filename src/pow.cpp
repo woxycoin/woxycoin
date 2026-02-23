@@ -34,23 +34,6 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                 return pindex->nBits;
             }
         }
-        // Emergency Difficulty Adjustment (EDA)
-        // If block is taking too long (>10x target spacing), reduce difficulty
-        if (pindexLast->nHeight >= params.nEDAHeight) {
-            int64_t nTimeSinceLastBlock = pblock->GetBlockTime() - pindexLast->GetBlockTime();
-            if (nTimeSinceLastBlock > params.nPowTargetSpacing * 10) {
-                int nReductions = nTimeSinceLastBlock / (params.nPowTargetSpacing * 10);
-                arith_uint256 bnNew;
-                bnNew.SetCompact(pindexLast->nBits);
-                const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
-                for (int i = 0; i < nReductions && i < 20; i++) {
-                    bnNew += bnNew / 5;  // +20% target = ~17% easier
-                }
-                if (bnNew > bnPowLimit)
-                    bnNew = bnPowLimit;
-                return bnNew.GetCompact();
-            }
-        }
         return pindexLast->nBits;
     }
 
