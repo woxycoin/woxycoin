@@ -34,6 +34,24 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                 return pindex->nBits;
             }
         }
+
+        // Emergency Difficulty Adjustment (EDA)
+        if (pindexLast->nHeight >= params.nEDAHeight) {
+            int64_t nTimeSinceLastBlock = pblock->GetBlockTime() - pindexLast->GetBlockTime();
+            if (nTimeSinceLastBlock > params.nPowTargetSpacing * 10) {
+                int nReductions = nTimeSinceLastBlock / (params.nPowTargetSpacing * 10);
+                arith_uint256 bnNew;
+                bnNew.SetCompact(pindexLast->nBits);
+                const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+                for (int i = 0; i < nReductions && i < 100; i++) {
+                    bnNew += bnNew / 5;
+                }
+                if (bnNew > bnPowLimit)
+                    bnNew = bnPowLimit;
+                return bnNew.GetCompact();
+            }
+        }
+
         return pindexLast->nBits;
     }
 

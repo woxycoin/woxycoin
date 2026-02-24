@@ -79,6 +79,7 @@ public:
         consensus.nPowTargetTimespan = 2016 * 90; // 2016 blocks
         consensus.nPowTargetSpacing = 90;
         consensus.fPowAllowMinDifficultyBlocks = false;
+        consensus.nEDAHeight = 23310;  // EDA activates after current block
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 6048; // 75% of 8064
         consensus.nMinerConfirmationWindow = 8064; // 4 * 2016
@@ -176,6 +177,7 @@ public:
         consensus.nPowTargetSpacing = 90;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
+        consensus.nEDAHeight = 0;  // EDA active from start on testnet
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -264,6 +266,7 @@ public:
         consensus.nPowTargetTimespan = 2016 * 90;
         consensus.nPowTargetSpacing = 90;
         consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.nEDAHeight = 0;  // EDA active from start on regtest
         consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)

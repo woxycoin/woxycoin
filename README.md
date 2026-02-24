@@ -72,6 +72,17 @@ echo -e "addnode=seed.woxycoin.org\naddnode=13.51.55.67" > ~/.woxycoin/woxycoin.
 - **DNS:** seed.woxycoin.org
 - **IP:** 13.51.55.67:9777
 
+## Emergency Difficulty Adjustment (EDA)
+
+Starting at block 23,310, Woxycoin includes an Emergency Difficulty Adjustment mechanism. If no block is found within 15 minutes (10x the target block time), the difficulty automatically decreases by ~20% for each additional 15-minute interval. This prevents the chain from stalling when hashrate drops suddenly.
+
+| Parameter | Value |
+|-----------|-------|
+| **Activation Block** | 23,310 |
+| **Trigger** | No block for 15 minutes |
+| **Reduction** | ~20% per 15-minute interval |
+| **Cap** | Difficulty cannot go below the minimum (powLimit) |
+
 ## Build from Source
 
 ```bash
