@@ -80,7 +80,7 @@ jobs:
         run: ./autogen.sh
 
       - name: Configure
-        run: ./configure --host=x86_64-w64-mingw32 --prefix=/mingw64 --with-gui=qt5 --with-incompatible-bdb --disable-tests --disable-bench
+        run: ./configure --host=x86_64-w64-mingw32 --prefix=/mingw64 --with-gui=qt5 --with-qt-bindir=/mingw64/bin --with-boost=/mingw64 --with-boost-libdir=/mingw64/lib --with-incompatible-bdb --disable-tests --disable-bench
 
       - name: Build
         run: make -j$(nproc)
