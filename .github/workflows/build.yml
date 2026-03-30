@@ -74,6 +74,7 @@ jobs:
             mingw-w64-x86_64-qrencode
             mingw-w64-x86_64-zeromq
             mingw-w64-x86_64-cppzmq
+            mingw-w64-x86_64-fmt
             zip
 
       - name: Autogen
